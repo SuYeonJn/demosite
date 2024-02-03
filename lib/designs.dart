@@ -11,19 +11,23 @@ class ButtonStyles {
   ///The box decoration for a button of primary status, for example the OK button in a dialog box
   static ButtonStyle primaryElevatedButton(BuildContext context) {
     return ElevatedButton.styleFrom(
-        padding: const EdgeInsets.all(20),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5),
-        ),
-        backgroundColor: const Color.fromRGBO(255, 69, 0, 100));
+      padding: const EdgeInsets.all(20),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+      ),
+      backgroundColor: const Color.fromRGBO(255, 69, 0, 100),
+    );
   }
 
   ///The box decoration for a button of non-primary status, for example the Cancel button in a dialog box
   static ButtonStyle secondaryElevatedButton(BuildContext context) {
     return ElevatedButton.styleFrom(
-        foregroundColor: const Color.fromRGBO(255, 69, 0, 100),
-        surfaceTintColor: const Color.fromRGBO(255, 69, 0, 100),
-        backgroundColor: cs(context).background);
+      padding: const EdgeInsets.all(20),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+      ),
+      backgroundColor: const Color.fromARGB(156, 255, 255, 255),
+    );
   }
 }
 

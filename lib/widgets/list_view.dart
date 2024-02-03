@@ -2,40 +2,68 @@ import 'package:demo_site/pages/add_post_page.dart';
 import 'package:demo_site/pages/read_post_page.dart';
 import 'package:flutter/material.dart';
 
-class HotList extends StatefulWidget {
-  const HotList({super.key});
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
+class ListTab extends StatefulWidget {
+  const ListTab({super.key, required this.category, required this.token});
+
+  final String category;
+  final String token;
   @override
-  State<HotList> createState() => _HotListState();
+  State<ListTab> createState() => _ListTabState();
 }
 
-class _HotListState extends State<HotList> {
-  List postData = [
-    {
-      "postId": 1,
-      "title": "등산을 잘하고 싶은 극강의 성능충 팁",
-      "category": "등산",
-      "content": "등산을 잘하고 싶은 극강의 성능충 팁"
-    },
-    {
-      "postId": 1,
-      "title": "등산화 추천 좀",
-      "category": "등산",
-      "content": "등산을 잘하고 싶은 극강의 성능충 팁",
-    },
-    {
-      "postId": 1,
-      "title": "러닝같이하실 분",
-      "category": "러닝",
-      "content": "등산을 잘하고 싶은 극강의 성능충 팁",
-    },
-  ];
+class _ListTabState extends State<ListTab> {
+  late List postData = [];
+  Future<void> readPost() async {
+    await http
+        .get(
+      Uri.parse(
+          "http://ec2-13-125-199-181.ap-northeast-2.compute.amazonaws.com:8000/article/"),
+    )
+        .then((value) {
+      setState(() {
+        postData = jsonDecode(utf8.decode(value.bodyBytes));
+        print(postData);
+      });
+    });
+
+    _category();
+  }
+
+  List _postList = [];
+  Map categoryMatch = {
+    "running": "러닝",
+    "hiking": "등산",
+  };
+  void _category() {
+    for (var element in postData) {
+      if (element['category'] == widget.category) {
+        setState(() {
+          _postList.add(element);
+        });
+      } else if (widget.category == "Hot") {
+        setState(() {
+          _postList = postData;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    readPost();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: ListView.builder(
-          itemCount: postData.length,
+          itemCount: _postList.length,
           itemBuilder: (_, index) {
             return ListTile(
               onTap: () {
@@ -43,8 +71,11 @@ class _HotListState extends State<HotList> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => ReadPost(
-                              title: postData[index]['title'],
-                              content: postData[index]['content'],
+                              title: _postList[index]['title'],
+                              content: _postList[index]['content'],
+                              articleId: _postList[index]['id'],
+                              postDatas: _postList[index],
+                              token: widget.token,
                             )));
               },
               shape: const Border(
@@ -57,13 +88,13 @@ class _HotListState extends State<HotList> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "${postData[index]['category']}",
+                    "${categoryMatch[_postList[index]['category']]}",
                     style: const TextStyle(
                       fontSize: 10,
                       color: Color.fromRGBO(74, 74, 74, 0.612),
                     ),
                   ),
-                  Text("${postData[index]['title']}"),
+                  Text("${_postList[index]['title']}"),
                 ],
               ),
               subtitle: const Row(
